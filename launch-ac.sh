@@ -22,7 +22,8 @@ export SDL_JOYSTICK_WHEEL_DEVICES=0x346e/0x0004
 GE="$HOME/.steam/steam/compatibilitytools.d/GE-Proton9-20"
 AC="$HOME/.steam/steam/steamapps/common/assettocorsa"
 
-# Kill any stale wineserver, then set HideWineExports so CSP's Wine-detection check passes.
+# Kill any stale wineserver. HideWineExports=Y makes Wine hide wine_get_version, so CSP's
+# GetProcAddress returns NULL -> CSP treats this as native Windows (Wine-specific paths stay off).
 "$GE/files/bin/wineserver" -k 2>/dev/null ; sleep 1
 WINEFSYNC=1 "$GE/files/bin/wine64" reg add "HKCU\\Software\\Wine" \
     /v HideWineExports /t REG_SZ /d "Y" /f 2>/dev/null

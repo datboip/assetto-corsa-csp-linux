@@ -42,7 +42,7 @@ In Steam → Assetto Corsa → **Properties → Compatibility → Force GE-Proto
 
 ## 2. Launch script
 
-This bypasses Content Manager for launching, kills any stale `wineserver`, sets `HideWineExports` so CSP passes its Wine-detection check, and launches AC. **Edit the flagged lines for your hardware.**
+This bypasses Content Manager for launching, kills any stale `wineserver`, sets `HideWineExports=Y` (which makes Wine **hide** `wine_get_version` — so CSP's `GetProcAddress` returns NULL and CSP thinks it's on **native Windows**, keeping its Wine-specific code paths off), and launches AC. **Edit the flagged lines for your hardware.**
 
 ```bash
 #!/bin/bash
@@ -65,7 +65,8 @@ export SDL_JOYSTICK_WHEEL_DEVICES=0x346e/0x0004
 GE="$HOME/.steam/steam/compatibilitytools.d/GE-Proton9-20"
 AC="$HOME/.steam/steam/steamapps/common/assettocorsa"
 
-# kill stale wineserver, then set HideWineExports so CSP's Wine check passes
+# kill stale wineserver; HideWineExports=Y hides wine_get_version so CSP can't
+# detect Wine and treats this as native Windows
 "$GE/files/bin/wineserver" -k 2>/dev/null ; sleep 1
 WINEFSYNC=1 "$GE/files/bin/wine64" reg add "HKCU\\Software\\Wine" \
     /v HideWineExports /t REG_SZ /d "Y" /f 2>/dev/null
