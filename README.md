@@ -78,7 +78,7 @@ Save as `launch-ac.sh`, `chmod +x launch-ac.sh`, run it. (Also in this repo as [
 
 ## 3. Install CSP + Pure
 
-Install [**Content Manager**](https://acstuff.club/) first, then **CSP 0.2.12-preview1** (from CM → Settings → Custom Shaders Patch), then **Pure 2.57** last. Sources are in [Tools & sources](#tools--sources) below.
+Install [**Content Manager**](https://acstuff.club/) first, then **CSP 0.2.12-preview1** (from CM → Settings → Custom Shaders Patch), then **Pure 2.57** last. Run CM in its own isolated prefix — see [Content Manager (separate prefix)](#content-manager--run-it-in-its-own-prefix). Sources are in [Tools & sources](#tools--sources) below.
 
 > Run **Content Manager in its own throwaway Wine prefix** (e.g. `~/.wine-cm`) for mod management only — don't use it to launch online sessions, and keep it out of the Proton prefix.
 
@@ -143,6 +143,21 @@ Once CSP loads, launch AC with the script and go **Drive → Online → Direct C
 > **Don't use Content Manager's server browser on Linux** — it crashes under Wine 9 (an IOCP socket bug). Direct Connect (or add-server-by-IP) avoids it.
 
 ---
+
+## Content Manager — run it in its own prefix
+
+Content Manager is only needed for **mod management** (installing CSP, Pure, cars, tracks). Run it in a **separate Wine prefix** (`~/.wine-cm`) so its .NET / Mono / Steam-bridge files never end up in the Proton prefix the game runs in — a polluted game prefix is a common, hard-to-debug cause of CSP/Proton issues.
+
+First-time setup (once):
+
+```bash
+WINEPREFIX="$HOME/.wine-cm" winecfg                          # create the prefix
+WINEPREFIX="$HOME/.wine-cm" winetricks -q dotnet48 corefonts # CM needs .NET 4.8
+```
+
+Then launch CM with [`launch-content-manager.sh`](launch-content-manager.sh) — it sets `WINEPREFIX="$HOME/.wine-cm"` and runs **`Content Manager Safe.exe`** (hardware acceleration off, which dodges Wine's renderer crashes).
+
+> The two prefixes share **nothing** except the read-only game folder (`…/common/assettocorsa/`) — and that's correct: it's the actual game content (cars/tracks/CSP), not a Wine prefix. Don't launch online sessions from CM — use [`launch-ac.sh`](launch-ac.sh).
 
 ## ReShade
 
