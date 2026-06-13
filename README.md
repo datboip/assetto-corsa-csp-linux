@@ -168,6 +168,7 @@ Then launch CM with [`launch-content-manager.sh`](launch-content-manager.sh) —
 - **CSP app shelf icons invisible** when you press **Home** — the debug console shows instead. Cosmetic Wine IMGUI issue, doesn't affect gameplay or weather.
 - **Content Manager server browser crashes** under Wine 9 (IOCP socket bug) — use Direct Connect.
 - **"Safe mode?" prompt** on first load after a crash — cosmetic, CSP still loads fully.
+- **Tracks with animated video billboards crash on load** (e.g. Shutoko Revival Project's ad screens). CSP plays those `.mp4` clips through Windows Media Foundation, which crashes **winegstreamer** under Wine. **Fix:** rename or delete the ad-screen `.mp4` files in that track's folder (search the track dir for `*.mp4`). Same root cause as **any in-game audio/video that uses CSP's media player** — if a CSP app or track tries to play a video/audio file and the game hard-crashes on Linux, this is why.
 
 ## For server admins (AssettoServer)
 
