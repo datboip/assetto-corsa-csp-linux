@@ -113,6 +113,8 @@ echo "post-CSP fixes applied."
 
 (Also in this repo as [`post-csp-install.sh`](post-csp-install.sh).)
 
+> **Still getting "Failed to patch" / `INIReader::cache … index=-1` on Wine 9?** That's a *second*, config-caused failure (separate from the Wine-10 W^X one). Fix it in CM → **Settings → Custom Shaders Patch → General Patch Settings → Optimizations** → **uncheck "Cache AC memory layout"** *and* **"Cache AC data to speed up loading."** CM silently re-enables both on every CSP update — re-check them each time. (`rm memory_layout.bin` above clears the stale cache; unchecking the boxes stops it coming back.)
+
 ## 5. Physics threads — `THREADS=0` and lock it
 
 In `system/cfg/assetto_corsa.ini` set **`THREADS=0`**, then make it read-only so Content Manager can't reset it:
@@ -169,6 +171,11 @@ Then launch CM with [`launch-content-manager.sh`](launch-content-manager.sh) —
 - **Content Manager server browser crashes** under Wine 9 (IOCP socket bug) — use Direct Connect.
 - **"Safe mode?" prompt** on first load after a crash — cosmetic, CSP still loads fully.
 - **Tracks with animated video billboards crash on load** (e.g. Shutoko Revival Project's ad screens). CSP plays those `.mp4` clips through Windows Media Foundation, which crashes **winegstreamer** under Wine. **Fix:** rename or delete the ad-screen `.mp4` files in that track's folder (search the track dir for `*.mp4`). Same root cause as **any in-game audio/video that uses CSP's media player** — if a CSP app or track tries to play a video/audio file and the game hard-crashes on Linux, this is why.
+- **Install AC on ext4/btrfs — NOT NTFS.** Assetto Corsa on an NTFS partition (common if you keep games on a shared Windows drive) crashes on load. Move the install to a native Linux filesystem.
+- **Turn off CSP's "Car Instruments" and "Music" modules** (CM → CSP → those modules → disable). Both use Windows Media Foundation → unstable under winegstreamer; disabling them removes a whole class of random crashes/freezes (same family as the video-billboard crash).
+- **Custom CSP sounds: use OGG Vorbis, not WAV/MP3.** Any soundboard/mod audio played through CSP's media player freezes winegstreamer if it's WAV or MP3; OGG decodes natively. (Authoring a CSP app that plays sound? Gate it behind `ui.MediaPlayer.supportedAsync()` so it no-ops on Linux instead of crashing.)
+- **Remove `--disable-gpu`** from your Steam launch options if it's there — a stray Chromium flag that breaks AC's rendering.
+- **"Steam init failed" in Content Manager** — launch CM elevated/as administrator in its prefix; it's a Steam-bridge admin-rights mismatch, not a missing dependency.
 
 ## For server admins (AssettoServer)
 
